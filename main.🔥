@@ -1,0 +1,11 @@
+struct myStruct:
+    var name: String
+    fn __init__(inout self, name: String):
+        self.name = name
+    fn getName(self) -> None:
+        print(self.name)
+fn main():
+    fn foo(x: Int, y: Int) -> Int:
+        return x + y
+    let structure = myStruct("hi")
+    structure.getName()
