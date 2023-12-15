@@ -1,7 +1,15 @@
-fn calc(n: Int) -> Float64:
-    return (1 + 1/n) ** n
+import benchmark
+fn fib(n: Int) -> Int:
+    if n <= 2:
+        return 1
+    else:
+        return fib(n-1) + fib(n-2)
+
+
+fn test():
+    print(fib(20))
 
 fn main():
-    let n = 10000
-    for i in range(n):
-        print(calc(i))
+    let report = benchmark.run[test]()
+    report.print()
+    
