@@ -30,9 +30,6 @@ struct Array[T: AnyRegType]:
             return
         self.ArrPointer.store(loc, item)
 
-    fn __del__(owned self) -> None:
-        self.ArrPointer.free()
-
     fn pop(inout self) -> T:
         if self.len == 0:
             print("pop: IndexError: Pop from empty array")
@@ -52,6 +49,81 @@ struct Array[T: AnyRegType]:
         for i in range(len(input)):
             self[i] = input[i]
             self.len = len(input)
+    
+    fn __del__(owned self) -> None:
+        self.ArrPointer.free()
+
+struct Stack[T: AnyRegType]:
+    var stack: Array[T]
+    var top: Int
+
+    fn __init__(inout self, default_value: T, capacity: Int = 10) -> None:
+        self.stack = Array[T](default_value, capacity)
+        self.top = -1
+    
+    fn len(borrowed self) -> Int:
+        return self.top + 1
+
+    fn push(inout self, item: T) -> None:
+        self.top += 1
+        self.stack[self.top] = item
+
+    fn pop(inout self) -> T:
+        if self.top == -1:
+            print("pop: IndexError: Pop from empty stack")
+            return self.stack.ArrPointer.load(0)  # or handle error differently
+        self.top -= 1
+        return self.stack[self.top + 1]
+
+    fn peek(borrowed self) -> T:
+        if self.top == -1:
+            print("peek: IndexError: Peek from empty stack")
+            return self.stack.ArrPointer.load(0)  # or handle error differently
+        return self.stack[self.top]
+    
+    fn load(inout self, input: VariadicList) -> None:
+        if len(input) > self.stack.len:
+            print("IndexError: VariadicList is larger than User-defined Stack Length")
+            return
+        for i in range(len(input)):
+            self.push(input[i])
+
+struct Queue[T: AnyRegType]:
+    var queue: Array[T]
+    var front: Int
+    var rear: Int
+
+    fn __init__(inout self, default_value: T, capacity: Int = 10) -> None:
+        self.queue = Array[T](default_value, capacity)
+        self.front = -1
+        self.rear = -1
+    
+    fn len(borrowed self) -> Int:
+        return self.rear - self.front + 1
+
+    fn enqueue(inout self, item: T) -> None:
+        self.rear += 1
+        self.queue[self.rear] = item
+
+    fn dequeue(inout self) -> T:
+        if self.front == self.rear:
+            print("dequeue: IndexError: Dequeue from empty queue")
+            return self.queue.ArrPointer.load(0)  # or handle error differently
+        self.front += 1
+        return self.queue[self.front]
+
+    fn peek(borrowed self) -> T:
+        if self.front == self.rear:
+            print("peek: IndexError: Peek from empty queue")
+            return self.queue.ArrPointer.load(0)  # or handle error differently
+        return self.queue[self.front]
+    
+    fn load(inout self, input: VariadicList) -> None:
+        if len(input) > self.queue.len:
+            print("IndexError: VariadicList is larger than User-defined Queue Length")
+            return
+        for i in range(len(input)):
+            self.enqueue(input[i])
 
 fn main():
     var loadList: VariadicList[Int] = VariadicList[Int](1,2,3,4,5)
@@ -60,3 +132,8 @@ fn main():
     myList.delete(2)
     for i in range(myList.len):
         print(myList[i])
+    
+    var myStack: Stack[Int] = Stack[Int](0, 10)
+    myStack.load(loadList)
+    for i in range(myStack.len()):
+        print(myStack.pop())
