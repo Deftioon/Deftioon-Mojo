@@ -1,8 +1,2 @@
-def convertTime(minutes):
-    hours = minutes // 60
-    minutes = minutes % 60
-    return f"{hours:02d}:{minutes:02d}"
-
-
-print(convertTime(60))
-
+for i in range(1000000):
+        print(str(i).rjust(6, '0'), end=' ')

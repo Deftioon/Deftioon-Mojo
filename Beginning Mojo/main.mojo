@@ -14,8 +14,8 @@ struct Array[T: AnyRegType]:
 
     fn __getitem__(borrowed self, i: Int) -> T:
         if i >= self.len:
-            print("IndexError: Out of Bounds")
-            return self.ArrPointer.load(0)
+            print("getitem: IndexError: Out of Bounds")
+            return self.ArrPointer.load(0) 
         return self.ArrPointer.load(i)
 
     fn __setitem__(inout self, loc: Int, item: T) -> None:
@@ -44,7 +44,7 @@ struct Array[T: AnyRegType]:
 
     fn load(inout self, input: VariadicList) -> None:
         if len(input) > self.len:
-            print("IndexError: VariadicList is larger than User-defined Array Length")
+            print("load: IndexError: VariadicList is larger than User-defined Array Length")
             return
         for i in range(len(input)):
             self[i] = input[i]
@@ -53,14 +53,14 @@ struct Array[T: AnyRegType]:
     fn __del__(owned self) -> None:
         self.ArrPointer.free()
 
-struct Stack[T: AnyRegType]:
+struct StackArray[T: AnyRegType]:
     var stack: Array[T]
     var top: Int
 
     fn __init__(inout self, default_value: T, capacity: Int = 10) -> None:
         self.stack = Array[T](default_value, capacity)
         self.top = -1
-    
+
     fn len(borrowed self) -> Int:
         return self.top + 1
 
@@ -83,12 +83,12 @@ struct Stack[T: AnyRegType]:
     
     fn load(inout self, input: VariadicList) -> None:
         if len(input) > self.stack.len:
-            print("IndexError: VariadicList is larger than User-defined Stack Length")
+            print("load: IndexError: VariadicList is larger than User-defined Stack Length")
             return
         for i in range(len(input)):
             self.push(input[i])
 
-struct Queue[T: AnyRegType]:
+struct QueueArray[T: AnyRegType]:
     var queue: Array[T]
     var front: Int
     var rear: Int
@@ -99,7 +99,7 @@ struct Queue[T: AnyRegType]:
         self.rear = -1
     
     fn len(borrowed self) -> Int:
-        return self.rear - self.front + 1
+        return self.rear - self.front
 
     fn enqueue(inout self, item: T) -> None:
         self.rear += 1
@@ -120,20 +120,13 @@ struct Queue[T: AnyRegType]:
     
     fn load(inout self, input: VariadicList) -> None:
         if len(input) > self.queue.len:
-            print("IndexError: VariadicList is larger than User-defined Queue Length")
+            print("load: IndexError: VariadicList is larger than User-defined Queue Length")
             return
         for i in range(len(input)):
             self.enqueue(input[i])
 
+struct ArrayTools:
+    fn __init__(inout self) -> None:
+        pass
+
 fn main():
-    var loadList: VariadicList[Int] = VariadicList[Int](1,2,3,4,5)
-    var myList: Array[Int] = Array[Int](0, 10)
-    myList.load(loadList)
-    myList.delete(2)
-    for i in range(myList.len):
-        print(myList[i])
-    
-    var myStack: Stack[Int] = Stack[Int](0, 10)
-    myStack.load(loadList)
-    for i in range(myStack.len()):
-        print(myStack.pop())
