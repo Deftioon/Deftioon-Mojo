@@ -29,3 +29,16 @@ struct Matrix:
 
     fn store[nelts: Int](self, y: Int, x: Int, val: SIMD[DType.float32, nelts]):
         return self.data.simd_store[nelts](y * self.cols + x, val)
+    
+    fn print(self):
+        print_no_newline("[")
+        for y in range(self.rows):
+            if y != 0:
+                print_no_newline(" ")
+            for x in range(self.cols):
+                print_no_newline(String(self[y, x]))
+                if x != self.cols - 1:
+                    print_no_newline(", ")
+            if y != self.rows - 1:
+                print()
+        print("]")

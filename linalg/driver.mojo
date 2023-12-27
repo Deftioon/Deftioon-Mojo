@@ -1,10 +1,8 @@
 import matrix
 
 fn main():
-    var m: matrix.Matrix = matrix.Matrix(3, 3)
-    for i in range(3):
-        for j in range(3):
+    let m: matrix.Matrix = matrix.Matrix(10, 10)
+    for i in range(m.rows):
+        for j in range(m.cols):
             m[i,j] = i * j
-    for i in range(3):
-        for j in range(3):
-            print(m[i,j])
+    m.print()
