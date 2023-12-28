@@ -1,9 +1,14 @@
+from algorithm import vectorize
+from algorithm import parallelize
 alias type = DType.float32
+
+# adapted from https://docs.modular.com/mojo/notebooks/Matmul.html
 
 struct Matrix:
     var data: DTypePointer[type]
     var rows: Int
     var cols: Int
+    var shape: (Int,Int)
 
     # Initialize zeroeing all values
     fn __init__(inout self, rows: Int, cols: Int):
@@ -11,12 +16,14 @@ struct Matrix:
         memset_zero(self.data, rows * cols)
         self.rows = rows
         self.cols = cols
+        self.shape = (rows, cols)
 
     # Initialize taking a pointer, don't set any elements
     fn __init__(inout self, rows: Int, cols: Int, data: DTypePointer[DType.float32]):
         self.data = data
         self.rows = rows
         self.cols = cols
+        self.shape = (rows, cols)
 
     fn __getitem__(self, y: Int, x: Int) -> Float32:
         return self.load[1](y, x)
@@ -42,3 +49,20 @@ struct Matrix:
             if y != self.rows - 1:
                 print()
         print("]")
+    # Parallelize the code by using the builtin parallelize function
+    fn matmul_parallelized(C: Matrix, A: Matrix, B: Matrix) raises -> None:
+        if A.cols != B.rows:
+            raise ("Error: Shape Mismatch: " + String(A.cols) + " does not match" + String(B.rows))
+        else:
+            alias nelts = simdwidthof[DType.float32]()
+            @parameter
+            fn calc_row(m: Int):
+                for k in range(A.cols):
+                    @parameter
+                    fn dot[nelts : Int](n : Int):
+                        C.store[nelts](m,n, C.load[nelts](m,n) + A[m,k] * B.load[nelts](k,n))
+                    vectorize[nelts, dot](C.cols)
+            parallelize[calc_row](C.rows, C.rows)
+        
+    fn __del__(owned self):
+        self.data.free()

@@ -1,4 +1,7 @@
 struct StringUtil:
     @staticmethod
     fn rjust(s: String, width: Int, fillchar: String = ' ') -> String:
-        return "wow"
+        var ret: String = ""
+        for i in range(width - len(s)):
+            ret += fillchar
+        return ret + s
