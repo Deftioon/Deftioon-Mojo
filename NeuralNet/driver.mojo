@@ -1,12 +1,11 @@
-from matrix import Matrix
-
+from linalg import Matrix
 
 fn main() raises:
-    let m: Matrix = Matrix(3, 4)
+    let m: Matrix = Matrix(3, 3)
     for i in range(m.rows):
         for j in range(m.cols):
-            m[i,j] = i * j
-    let n: Matrix = Matrix(4, 3)
+            m[i,j] = i + j 
+    let n: Matrix = Matrix(3, 3)
     for i in range(n.rows):
         for j in range(n.cols):
             n[i,j] = i // j + i % j
