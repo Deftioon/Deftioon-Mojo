@@ -124,7 +124,7 @@ struct QueueArray[T: AnyRegType]:
             return
         for i in range(len(input)):
             self.enqueue(input[i])
-
+            
 from algorithm import vectorize
 from algorithm import parallelize
 alias type = DType.float32

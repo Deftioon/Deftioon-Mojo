@@ -8,8 +8,8 @@ fn main() raises:
     let n: Matrix = Matrix(3, 3)
     for i in range(n.rows):
         for j in range(n.cols):
-            n[i,j] = i // j + i % j
-    let res: Matrix = Matrix(3,3)
+            n[i,j] = i // j + i % j + j + i
+    let res: Matrix = Matrix(m.rows,n.cols)
 
     Matrix.matmul_parallelized(res, m, n)
     m.print()
