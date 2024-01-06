@@ -1,5 +1,9 @@
 from memory.unsafe import Pointer
-
+import mathLib as  uMath
+from algorithm import vectorize
+from algorithm import parallelize
+alias type = DType.float64
+alias nelts = simdwidthof[DType.float64]()
 struct Array[T: AnyRegType]:
     var ArrPointer: Pointer[T]
     var len: Int
@@ -124,10 +128,15 @@ struct QueueArray[T: AnyRegType]:
             return
         for i in range(len(input)):
             self.enqueue(input[i])
-            
-from algorithm import vectorize
-from algorithm import parallelize
-alias type = DType.float32
+
+struct Broadcasting:
+    fn __init__(inout self):
+        pass
+    @staticmethod
+    fn Sigmoid(x: Matrix):
+        for i in range(x.rows):
+            for j in range(x.cols):
+                x[i,j] = 1 / (1 + uMath.e ** (-x[i,j]))
 
 # adapted from https://docs.modular.com/mojo/notebooks/Matmul.html
 
@@ -146,22 +155,22 @@ struct Matrix:
         self.shape = (rows, cols)
 
     # Initialize taking a pointer, don't set any elements
-    fn __init__(inout self, rows: Int, cols: Int, data: DTypePointer[DType.float32]):
+    fn __init__(inout self, rows: Int, cols: Int, data: DTypePointer[DType.float64]):
         self.data = data
         self.rows = rows
         self.cols = cols
         self.shape = (rows, cols)
 
-    fn __getitem__(self, y: Int, x: Int) -> Float32:
+    fn __getitem__(self, y: Int, x: Int) -> Float64:
         return self.load[1](y, x)
 
-    fn __setitem__(self, y: Int, x: Int, val: Float32):
+    fn __setitem__(self, y: Int, x: Int, val: Float64):
         return self.store[1](y, x, val)
 
-    fn load[nelts: Int](self, y: Int, x: Int) -> SIMD[DType.float32, nelts]:
+    fn load[nelts: Int](self, y: Int, x: Int) -> SIMD[DType.float64, nelts]:
         return self.data.simd_load[nelts](y * self.cols + x)
 
-    fn store[nelts: Int](self, y: Int, x: Int, val: SIMD[DType.float32, nelts]):
+    fn store[nelts: Int](self, y: Int, x: Int, val: SIMD[DType.float64, nelts]):
         return self.data.simd_store[nelts](y * self.cols + x, val)
     
     fn print(self):
@@ -181,7 +190,6 @@ struct Matrix:
         if A.cols != B.rows:
             raise ("Error: Shape Mismatch: " + String(A.cols) + " does not match" + String(B.rows))
         else:
-            alias nelts = simdwidthof[DType.float32]()
             @parameter
             fn calc_row(m: Int):
                 for k in range(A.cols):
