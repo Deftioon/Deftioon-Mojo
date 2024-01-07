@@ -1,9 +1,17 @@
 from memory.unsafe import Pointer
-import mathLib as  uMath
 from algorithm import vectorize
 from algorithm import parallelize
 alias type = DType.float64
 alias nelts = simdwidthof[DType.float64]()
+
+struct MathU:
+    var e: Float64
+    var pi: Float64
+
+    fn __init__(inout self):
+        self.e = 2.71828182845904523536028747135266249775724709369995
+        self. pi = 3.14159265358979323846264338327950288419716939937510
+
 struct Array[T: AnyRegType]:
     var ArrPointer: Pointer[T]
     var len: Int
@@ -130,13 +138,14 @@ struct QueueArray[T: AnyRegType]:
             self.enqueue(input[i])
 
 struct Broadcasting:
+    var MathUnit: MathU
     fn __init__(inout self):
-        pass
-    @staticmethod
-    fn Sigmoid(x: Matrix):
+        self.MathUnit = MathU()
+
+    fn Sigmoid(inout self, x: Matrix):
         for i in range(x.rows):
             for j in range(x.cols):
-                x[i,j] = 1 / (1 + uMath.e ** (-x[i,j]))
+                x[i,j] = 1 / (1 + self.MathUnit.e ** (-x[i,j]))
 
 # adapted from https://docs.modular.com/mojo/notebooks/Matmul.html
 
